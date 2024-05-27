@@ -1,0 +1,114 @@
+.register {
+    width: 70%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.register .col-10 .row {
+    box-shadow: -12px -20px 190px 180px rgba(32, 160, 39, 0.075);
+    border-radius: 15px;
+}
+
+.register img {
+    width: 100%;
+    height: 100%;
+    border-radius: 15px 0 0 15px;
+}
+
+.register input {
+    border: 1px solid #ced1d4;
+    border-radius: 2px;
+    height: 8.5%;
+    padding-left: 8px;
+}
+
+.register .register-btn {
+    background-color: #77BF43;
+}
+
+.register .btn:hover {
+    background-color: #72b840;
+}
+
+.register .google-btn {
+    background-color: #ffffff;
+    border: 1px solid #e9ebec;
+}
+
+.register .google-btn img{
+    width: 20px;
+    height: auto;
+}
+
+.register .google-btn:hover {
+    background-color: #ffffff;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.register .text a {
+    color: #77BF43;
+    font-size: 1rem;
+    text-decoration: none;
+   
+    
+}
+
+.register .text a:hover {
+    border-bottom: 1px solid;
+    padding-bottom: 2px; 
+    transition: 0.3s ease all;
+}
+
+@media only screen and (max-width:950px) {
+    .register {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width:750px) {
+    .register {
+        max-width: 100%!important;
+    }
+}
+
+@media only screen and (max-width:601px) {
+    .register {
+        width: 100%;
+    }
+
+    .register img {
+        /* width: 100vw!important; */
+    }
+
+    .register input {
+        font-size: 0.9rem;
+        padding: 10px;
+        margin: 0.5rem auto!important;
+    }
+}
+
+@media only screen and (max-width:576px) {
+
+
+    .register .col-10 .row {
+        box-shadow: none;
+    }
+
+
+    .register input {
+        font-size: 1rem;
+        height: 12%;
+        width: 100%!important;
+    }
+
+    .register button {
+        width: 100%!important;
+    }
+}
+
+
+
+
+

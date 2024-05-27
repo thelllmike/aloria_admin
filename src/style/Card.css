@@ -1,0 +1,94 @@
+.card {
+    width: auto; /* Adjust width for smaller cards */
+    height: auto;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 8px 24px;
+}
+
+.card .card-img-top {
+    width: 100%;
+    height: 200px; /* Adjust height for a more compact look */
+    object-fit: cover;
+}
+
+
+.card .card-body {
+    padding: 15px;
+}
+
+.card .card-title {
+    font-size: 1.1rem;
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.card .category {
+    font-size: 0.9rem;
+    color: #777;
+    text-decoration: underline;
+}
+
+.card .price {
+    color: #77bf43;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.card .description {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 10px 0;
+}
+
+.card .quantity {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.quantity.second-card {
+    background-color: #ffe6e6;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.card .buttons .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.card .buttons .btn.edit-btn {
+    background-color: #77bf43;
+    color: #fff;
+}
+
+.card .buttons .btn.edit-btn:hover {
+    background-color: #66a837;
+}
+
+.card .buttons .btn.delete-btn {
+    background-color: #ff4d4d;
+    color: #fff;
+}
+
+.card .buttons .btn.delete-btn:hover {
+    background-color: #e60000;
+}
+
+.card .buttons .btn i {
+    margin-right: 5px;
+}
