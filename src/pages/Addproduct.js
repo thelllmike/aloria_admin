@@ -4,26 +4,33 @@ import Swal from "sweetalert2";
 import placeholderImage from "../images/cloud.png";
 import Sidebar from "../components/Sidebar";
 import "../style/Addproduct.css";
+import axios from 'axios';
+import { storage } from '../firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const categoryOptions = [
-    { value: 'category1', label: 'Category 1' },
-    { value: 'category2', label: 'Category 2' },
-    { value: 'category3', label: 'Category 3' },
-];
-
-const brandOptions = [
-    { value: 'brand1', label: 'Brand 1' },
-    { value: 'brand2', label: 'Brand 2' },
-    { value: 'brand3', label: 'Brand 3' },
+    { value: 'Oily', label: 'Oily' },
+    { value: 'Dry', label: 'Dry' },
+    { value: 'Normal', label: 'Normal' },
+    { value: 'Sensitive', label: 'Sensitive' },
 ];
 
 const AddProductForm = () => {
+    const [productName, setProductName] = useState('');
+    const [quantity, setQuantity] = useState('');
+    const [price, setPrice] = useState('');
+    const [cost, setCost] = useState('');
+    const [description, setDescription] = useState('');
+    const [category, setCategory] = useState(null);
+    const [brand, setBrand] = useState('');
     const [image, setImage] = useState(placeholderImage);
+    const [file, setFile] = useState(null);
     const fileInput = useRef(null);
 
     const handleImageChange = (event) => {
         if (event.target.files && event.target.files[0]) {
             const reader = new FileReader();
+            setFile(event.target.files[0]);
 
             reader.onloadend = () => {
                 setImage(reader.result);
@@ -33,7 +40,7 @@ const AddProductForm = () => {
         }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         Swal.fire({
@@ -44,16 +51,88 @@ const AddProductForm = () => {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, add it!'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                // Proceed with form submission logic here
-                console.log("Form submitted");
-                Swal.fire(
-                    'Added!',
-                    'Your item has been added.',
-                    'success'
-                );
-                // Add your form submission logic here
+                try {
+                    // Create the product first
+                    const productData = {
+                        product_name: productName,
+                        description,
+                        price: parseFloat(price),
+                        stock: parseInt(quantity, 10),
+                        category: category.value,
+                        cost: parseFloat(cost),
+                        brand
+                    };
+
+                    console.log("Sending product data:", productData);
+
+                    const productResponse = await axios.post('http://127.0.0.1:8001/products/', productData, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (productResponse.status === 200) {
+                        const product = productResponse.data;
+                        console.log("Product created with ID:", product.product_id);
+
+                        // Show alert with product ID
+                        Swal.fire(
+                            'Product Created!',
+                            `Product ID: ${product.product_id}`,
+                            'success'
+                        );
+
+                        // Upload the image to Firebase Storage and get the download URL
+                        if (file) {
+                            const storageRef = ref(storage, `images/${product.product_id}_${file.name}`);
+                            await uploadBytes(storageRef, file);
+                            const downloadURL = await getDownloadURL(storageRef);
+
+                            console.log("Image URL:", downloadURL);
+
+                            // Send the image URL to your backend to update the product with the image URL
+                            const imageResponse = await axios.post('http://127.0.0.1:8001/product_images', {
+                                product_id: product.product_id,
+                                image_url: downloadURL
+                            }, {
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            if (imageResponse.status === 200) {
+                                Swal.fire(
+                                    'Added!',
+                                    'Your item has been added.',
+                                    'success'
+                                );
+                            } else {
+                                const errorData = imageResponse.data;
+                                console.error("Image upload failed:", errorData);
+                                throw new Error('Image upload failed');
+                            }
+                        } else {
+                            Swal.fire(
+                                'Added!',
+                                'Your item has been added.',
+                                'success'
+                            );
+                        }
+                    } else {
+                        const errorData = productResponse.data;
+                        console.error("Product creation failed:", errorData);
+                        throw new Error('Product creation failed');
+                    }
+                } catch (error) {
+                    console.error("Error during form submission:", error);
+                    Swal.fire(
+                        'Error!',
+                        'There was a problem adding the item.',
+                        'error'
+                    );
+                }
             } else if (result.isDismissed) {
                 console.log("Form submission cancelled");
             }
@@ -73,29 +152,34 @@ const AddProductForm = () => {
                             <div className="form-content d-flex flex-column">
                                 <div className="form-fields col-12 col-md-9">
                                     <div className="form-group order-1 my-2">
-                                        <input type="text" className="form-control" placeholder="Product Name" />
+                                        <input type="text" className="form-control" placeholder="Product Name" value={productName} onChange={(e) => setProductName(e.target.value)} required />
                                     </div>
                                     <div className="form-group order-1 my-2">
-                                        <input type="number" className="form-control" placeholder="Quantity" />
+                                        <input type="number" className="form-control" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
                                     </div>
                                     <div className="form-group order-1 my-2">
-                                        <input type="number" className="form-control" placeholder="Cost" />
+                                        <input type="number" className="form-control" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} required />
                                     </div>
                                     <div className="form-group order-1 my-2">
-                                        <textarea className="form-control" placeholder="Description"></textarea>
+                                        <input type="number" className="form-control" placeholder="Cost" value={cost} onChange={(e) => setCost(e.target.value)} required />
                                     </div>
                                     <div className="form-group order-1 my-2">
-                                        <Select options={categoryOptions} placeholder="Select Category" />
+                                        <textarea className="form-control" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required></textarea>
                                     </div>
                                     <div className="form-group order-1 my-2">
-                                        <Select options={brandOptions} placeholder="Select Brand" />
+                                        <Select options={categoryOptions} placeholder="Select Category" onChange={setCategory} value={category} required />
+                                    </div>
+                                    <div className="form-group order-1 my-2">
+                                        <input type="text" className="form-control" placeholder="Brand" value={brand} onChange={(e) => setBrand(e.target.value)} required />
                                     </div>
                                     <div className="form-group order-1">
                                         <input
                                             type="file"
                                             ref={fileInput}
                                             style={{ display: "none" }}
+                                            accept="image/*"
                                             onChange={handleImageChange}
+                                            required
                                         />
                                     </div>
                                     <div className="image-preview col-12 col-md-3 text-center order-2 mb-3 mb-md-0">

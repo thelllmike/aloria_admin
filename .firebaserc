@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "testing-75de8"
-  }
+    "default": "skin-detection-440e4",
+    "storage": "skin-detection-440e4"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
