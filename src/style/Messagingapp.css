@@ -360,3 +360,22 @@
         font-size: 0.9rem;
     }
 }
+
+
+.discussion .message-content .name {
+    font-weight: bold;
+}
+
+.discussion .message-content .last-message {
+    color: green;
+}
+
+.messagechat.sent .bubble {
+    background-color: #c4f0c4;
+    text-align: right;
+}
+
+.messagechat.received .bubble {
+    background-color: #f0f0f0;
+    text-align: left;
+}

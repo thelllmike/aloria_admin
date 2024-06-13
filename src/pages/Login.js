@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import login from '../images/login-image.png';
 import google from '../images/google-logo.png';
 import '../style/Login.css';
+import { UserContext } from '../contexts/UserContext';
 
 const AdminLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { setUser } = useContext(UserContext);  // Use the user context
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -26,9 +28,11 @@ const AdminLogin = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                const role = data.role;
+                const { role, user_id } = data;
 
                 if (role === 'admin') {
+                    setUser({ id: user_id, email, role });  // Store user ID and other details in context
+                    alert(`Logged in with user ID: ${user_id}`);  // Show alert with user ID
                     navigate('/dashboard');
                 } else {
                     alert("You do not have access. Please register as an admin to access this resource.");
