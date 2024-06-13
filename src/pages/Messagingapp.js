@@ -43,9 +43,9 @@ const MessengerApp = () => {
 
 	const fetchMessages = async (conversationId) => {
 		try {
-			const response = await api.get(`/api/conversations/${conversationId}/messages`);
-			const messages = response.data;
-			setChatContent(messages);
+			const response = await api.get(`/api/conversations/${conversationId}`);
+			const conversation = response.data;
+			setChatContent(conversation.messages);
 		} catch (error) {
 			Swal.fire("Error", "Failed to fetch messages.", "error");
 			console.error("Failed to fetch messages:", error);
@@ -97,9 +97,9 @@ const MessengerApp = () => {
 	const getReceiverName = (discussion) => {
 		if (!discussion || !user) return "";
 		if (discussion.user1_id === user.id) {
-			return discussion.user2 ? discussion.user2.name : "";
+			return discussion.user2_username;
 		} else {
-			return discussion.user1 ? discussion.user1.name : "";
+			return discussion.user1_username;
 		}
 	};
 
@@ -108,7 +108,7 @@ const MessengerApp = () => {
 	}
 
 	return (
-		<div className='messagingapp container-fluid ps-0 m-0  d-flex'>
+		<div className='messagingapp container-fluid ps-0 m-0 d-flex'>
 			<div className='col-2 col-md-1 col-sm-1 col-lg-2'>
 				<Sidebar />
 			</div>
@@ -148,6 +148,7 @@ const MessengerApp = () => {
 								<div key={index} className={`messagechat ${chat.sender_id === user.id ? "sent" : "received"}`}>
 									<div className='bubble'>
 										<p>{chat.message}</p>
+										<p className='username'>{chat.sender_username}</p> {/* Display sender's username */}
 									</div>
 								</div>
 							))}
