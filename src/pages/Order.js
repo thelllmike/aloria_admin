@@ -7,127 +7,41 @@ import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import OrderCard from './OrderCard';
+import axios from 'axios';
 
 const Order = () => {
-    const [orders, setOrders] = useState([
-        {
-            productName: 'Product A',
-            customer: 'John Doe Abraham',
-            category: 'Category A',
-            address: '124 Main St, City',
-            quantity: 10,
-            price: '$50.00',
-            status: 'Pending',
-            orderDate: '2024-02-15',
-            img: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product B',
-            customer: 'Jane Smith',
-            category: 'Category B',
-            address: '456 Elm St, Town',
-            quantity: 5,
-            price: '$30.00',
-            status: 'Pending',
-            orderDate: '2024-03-16',
-            img: 'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product C',
-            customer: 'Michael Johnson',
-            category: 'Category A',
-            address: '789 Oak St, Village',
-            quantity: 20,
-            price: '$100.00',
-            status: 'Pending',
-            orderDate: '2024-08-17',
-            img: 'https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product D',
-            customer: 'Emily Williams',
-            category: 'Category C',
-            address: '101 Pine St, Hamlet',
-            quantity: 8,
-            price: '$45.00',
-            status: 'Rejected',
-            orderDate: '2024-08-18',
-            img: 'https://images.pexels.com/photos/678783/pexels-photo-678783.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product E',
-            customer: 'Daniel Brown',
-            category: 'Category A',
-            address: '222 Cedar St, Village',
-            quantity: 15,
-            price: '$75.00',
-            status: 'Rejected',
-            orderDate: '2024-05-19',
-            img: 'https://images.pexels.com/photos/1547971/pexels-photo-1547971.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product F',
-            customer: 'Olivia Davis',
-            category: 'Category B',
-            address: '333 Maple St, Town',
-            quantity: 12,
-            price: '$60.00',
-            status: 'Completed',
-            orderDate: '2024-01-20',
-            img: 'https://images.pexels.com/photos/1484810/pexels-photo-1484810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product G',
-            customer: 'Ethan Wilson',
-            category: 'Category C',
-            address: '444 Walnut St, Hamlet',
-            quantity: 6,
-            price: '$35.00',
-            status: 'Delivering',
-            orderDate: '2024-02-21',
-            img: 'https://images.pexels.com/photos/634021/pexels-photo-634021.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product H',
-            customer: 'Ava Garcia',
-            category: 'Category A',
-            address: '555 Birch St, Village',
-            quantity: 18,
-            price: '$90.00',
-            status: 'Completed',
-            orderDate: '2024-05-22',
-            img: 'https://images.pexels.com/photos/1370750/pexels-photo-1370750.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product I',
-            customer: 'William Rodriguez',
-            category: 'Category B',
-            address: '666 Oak St, Town',
-            quantity: 9,
-            price: '$55.00',
-            status: 'Delivering',
-            orderDate: '2024-05-24',
-            img: 'https://images.pexels.com/photos/1435612/pexels-photo-1435612.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-        {
-            productName: 'Product J',
-            customer: 'Sophia Martinez',
-            category: 'Category C',
-            address: '777 Pine St, Hamlet',
-            quantity: 11,
-            price: '$65.00',
-            status: 'Pending',
-            orderDate: '2024-05-24',
-            img: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-        },
-    ]);
-
+    const [orders, setOrders] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [categoryFilter, setCategoryFilter] = useState(null);
     const [statusFilter, setStatusFilter] = useState(null);
     const [dateRange, setDateRange] = useState([{ startDate: null, endDate: null, key: 'selection' }]);
     const [showCalendar, setShowCalendar] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8001/orders/order-details/?skip=0&limit=100');
+                const fetchedOrders = response.data.map(order => ({
+                    orderItemId: order.order_item_id,  // Ensure this is correctly fetched and set
+                    productName: order.product_name,
+                    customer: order.customer,
+                    category: order.category,
+                    address: order.address,
+                    quantity: order.quantity,
+                    price: `$${order.price.toFixed(2)}`,
+                    status: order.status.charAt(0).toUpperCase() + order.status.slice(1),
+                    orderDate: new Date(order.order_date).toLocaleDateString(),
+                    img: 'https://via.placeholder.com/50' // Default placeholder image, you can replace it with actual image URL if available
+                }));
+                setOrders(fetchedOrders);
+            } catch (error) {
+                console.error('Error fetching order details:', error);
+            }
+        };
+
+        fetchOrders();
+    }, []);
 
     useEffect(() => {
         const handleResize = () => {
@@ -148,20 +62,22 @@ const Order = () => {
                 return { bg: 'bg-success', text: 'text-success', color: '#198754' };
             case 'pending':
                 return { bg: 'bg-warning', text: 'text-warning', color: '#ffc107' };
-            case 'rejected':
+            case 'cancelled':
                 return { bg: 'bg-danger', text: 'text-danger', color: '#dc3545' };
-            case 'delivering':
+            case 'shipped':
                 return { bg: 'bg-primary', text: 'text-primary', color: '#0d6efd' };
+            case 'delivered':
+                return { bg: 'bg-info', text: 'text-info', color: '#0dcaf0' };
             default:
                 return { bg: '', text: '', color: 'black' };
         }
     };
 
     const statusOptions = [
-        { value: 'Pending', label: 'Pending', ...getStatusColors('Pending') },
-        { value: 'Delivering', label: 'Delivering', ...getStatusColors('Delivering') },
-        { value: 'Completed', label: 'Completed', ...getStatusColors('Completed') },
-        { value: 'Rejected', label: 'Rejected', ...getStatusColors('Rejected') }
+        { value: 'pending', label: 'Pending', ...getStatusColors('pending') },
+        { value: 'shipped', label: 'Shipped', ...getStatusColors('shipped') },
+        { value: 'delivered', label: 'Delivered', ...getStatusColors('delivered') },
+        { value: 'cancelled', label: 'Cancelled', ...getStatusColors('cancelled') }
     ];
 
     const categoryOptions = [
@@ -170,12 +86,21 @@ const Order = () => {
         { value: 'Category C', label: 'Category C' }
     ];
 
-    const changeStatus = (index, newStatus) => {
+    const changeStatus = async (index, newStatus) => {
         const confirmation = window.confirm(`Are you sure you want to change the status to ${newStatus}?`);
         if (confirmation) {
             const newOrders = [...orders];
             newOrders[index].status = newStatus;
             setOrders(newOrders);
+            
+            try {
+                await axios.put(`http://127.0.0.1:8001/order_items/item/${newOrders[index].orderItemId}`, {
+                    status: newStatus.toLowerCase()
+                });
+                console.log('Status updated successfully');
+            } catch (error) {
+                console.error('Error updating status:', error);
+            }
         }
     };
 
@@ -231,7 +156,7 @@ const Order = () => {
         }
         let matchesStatus = true;
         if (statusFilter) {
-            matchesStatus = order.status === statusFilter.value;
+            matchesStatus = order.status.toLowerCase() === statusFilter.value.toLowerCase();
         }
         let matchesDateRange = true;
         if (dateRange[0].startDate && dateRange[0].endDate) {
@@ -260,7 +185,7 @@ const Order = () => {
                     </div>
                     <div className="col-2 col-md-1 col-sm-1 col-lg-1">
                         <button className="btn calendar-btn text-primary border" onClick={() => setShowCalendar(!showCalendar)}>
-                            <i class="fa-solid fa-calendar-days"></i>
+                            <i className="fa-solid fa-calendar-days"></i>
                         </button>
                     </div>
                     <div className="col-2 col-md-1 col-sm-1 col-lg-1">
@@ -313,7 +238,6 @@ const Order = () => {
                             }}
                             className="me-2 select-container"
                         />
-
                     </div>
                     {showCalendar && (
                         <div className="calendar-container position-absolute" style={{ zIndex: 999 }}>
@@ -379,7 +303,7 @@ const Order = () => {
                                         <Select
                                             options={statusOptions}
                                             isSearchable={true}
-                                            value={statusOptions.find(option => option.value === order.status)}
+                                            value={statusOptions.find(option => option.value.toLowerCase() === order.status.toLowerCase())}
                                             onChange={(option) => changeStatus(index, option.value)}
                                             styles={colourStyles}
                                         />
@@ -391,7 +315,6 @@ const Order = () => {
                 )}
             </div>
         </div>
-
     );
 };
 
